@@ -13,8 +13,14 @@ class ProductSerializer(serializers.ModelSerializer):
             )
         ],
     )
-    active = serializers.BooleanField(read_only=False)
 
     class Meta:
         model = Product
         fields = ["sku", "name", "description", "active"]
+
+
+class CsvUploadSerializer(serializers.Serializer):
+    file = serializers.FileField()
+
+    class Meta:
+        fields = ["file"]
