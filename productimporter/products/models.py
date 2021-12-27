@@ -15,6 +15,9 @@ class TimestampMixin(models.Model):
 
 class Product(TimestampMixin):
     sku = models.SlugField(max_length=20, unique=True)
-    name = models.CharField(max_length=20, blank=False, null=False)
+    name = models.CharField(max_length=255, blank=False, null=False)
     description = models.CharField(max_length=255, blank=False, null=False)
     active = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"{self.sku}, {self.name}, {self.active}"

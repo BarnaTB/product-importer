@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "secret_key"
+SECRET_KEY = get_env_variable("SECRET_KEY", required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = bool(int(get_env_variable("DEBUG", required=True)))
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'django_celery_results',
     'products',
 ]
 
@@ -81,7 +82,7 @@ WSGI_APPLICATION = 'productimporter.wsgi.application'
 
 DATABASES = {
     'default': {
-        "ENGINE": get_env_variable("SQL_ENGINE", "django.db.backends.sqlite3"),
+        "ENGINE": get_env_variable("DB_ENGINE", "django.db.backends.sqlite3", required=True),
         "NAME": get_env_variable("DB_NAME", "productimporter"),
         "USER": get_env_variable("DB_USER", "postgres"),
         "PASSWORD": get_env_variable("DB_PASSWORD", "some_password"),
@@ -108,6 +109,11 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 50
+}
 
 
 # Internationalization
@@ -137,3 +143,10 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CELERY_BROKER_URL = get_env_variable("CELERY_BROKER_URL", required=True)
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_CACHE_BACKEND = "django-cache"
+
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_CHUNK_SIZE = get_env_variable("CELERY_CHUNK_SIZE")
