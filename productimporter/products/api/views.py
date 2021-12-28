@@ -1,11 +1,14 @@
 import csv, io
 
+from celery.result import AsyncResult
+
 from django.shortcuts import render
 from django.conf import settings
 
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from productimporter.productimporter.utils.decorators import required_fields
 
 from products.tasks import upload_products
 from products.api.serializers import CsvUploadSerializer, ProductSerializer
@@ -50,18 +53,9 @@ class CsvUploadView(generics.GenericAPIView):
         decoded_file = file.read().decode()
         io_string = io.StringIO(decoded_file)
         reader = csv.reader(io_string)
-        # print(dir(reader))
-        # print("reader length >>>>>>>>>>>>>>>>>>>>>> ", dir(reader))
-        # rows = list(reader)
         next(reader)
-        # print(len(reader))
-        # for row in reader:
-        #     print(row)
-        # print(list(reader))
-        # upload_products_csv.chunks(reader, settings.CELERY_CHUNK_SIZE).apply_sync(queue="high_priority")
         task_id = upload_products.delay(list(reader))
         print(">>>>>>>>>>>>>>>>>>>>>>> ", task_id)
-        # product_chunks.apply_async(queue="high_priority")
 
         response_data = {
             "success": True,
