@@ -8,7 +8,7 @@ from django.conf import settings
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from productimporter.productimporter.utils.decorators import required_fields
+from productimporter.utils.decorators import required_fields
 
 from products.tasks import upload_products
 from products.api.serializers import CsvUploadSerializer, ProductSerializer

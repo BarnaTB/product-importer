@@ -1,7 +1,7 @@
 from collections import ChainMap
 from functools import wraps
 
-from utils.exceptions import CustomAPIException
+from productimporter.utils.exceptions import CustomAPIException
 
 
 def required_fields(params):
