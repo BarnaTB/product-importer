@@ -7,6 +7,15 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import CircularProgress from '@mui/material/CircularProgress';
+import Table from '@mui/material/Table';
+import TableContainer from '@mui/material/TableContainer';
+import TableRow from '@mui/material/TableRow';
+import TableHead from '@mui/material/TableHead';
+import TableCell from '@mui/material/TableCell';
+import TableBody from '@mui/material/TableBody';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 
 
@@ -24,10 +33,15 @@ class App extends Component {
       alertTitle: "",
       alertDetail: "",
     },
+    loading: false,
     file: ''
   }
 
-  handleSubmit = event => {
+  componentDidMount = () => {
+    this.handleFetchProducts();
+  }
+
+  handleSubmitForm = event => {
     if (!this.state.sku) {
       this.setState({
         ...this.state,
@@ -59,6 +73,10 @@ class App extends Component {
         }
       });
     } else {
+      this.setState({
+        ...this.state,
+        loading: true
+      })
       axios.post(
         `http://localhost:8000/api/v1/products/`,
         {
@@ -67,23 +85,24 @@ class App extends Component {
           description: this.state.description
         }).then(response => this.setState({
           ...this.state,
+          loading: false,
           alert: {
             showAlert: true,
             severity: 'success',
             alertTitle: 'Hooray!!!',
             alertDetail: 'Product successfully created!'
           }
-        }))
+        })).catch(err => console.log(err))
     }
   }
 
   handleFetchProducts = () => {
-    axios.get(`http://localhost:8000/api/v1/products/products/`)
+    axios.get(`http://localhost:8000/api/v1/products/`)
     .then(response => this.setState({
       ...this.state,
       products: response.data,
       productsList: response.data.results
-    })).catch(err => console.log(err))
+    })).catch(err => console.log(err.sku))
   }
 
   handleChange = event => {
@@ -171,15 +190,25 @@ class App extends Component {
           <TextField id="outlined-basic" label="SKU" variant="outlined" name="sku" onChange={this.handleChange} required/><br/><br/>
           <TextField id="filled-basic" label="Name" variant="outlined" name="name" onChange={this.handleChange} required/><br/><br/>
           <TextField id="standard-basic" label="Description" variant="outlined" name="description" onChange={this.handleChange} required/><br/><br/>          
-          <Button variant="contained" startIcon={<AddCircleIcon/>} onClick={this.handleSubmit}>Add Product</Button><br/><br/>
+          <Button
+            variant="contained"
+            startIcon={<AddCircleIcon/>}
+            onClick={this.handleSubmitForm} 
+            disabled={this.state.loading}
+          >
+            {
+              this.state.loading ?
+              (<CircularProgress size={30} color="primary" />) :
+              ('Add Product')
+            }
+          </Button><br/><br/>
           <p style={{margin: 'auto'}}>Or Upload a batch of products</p><br/><br/>
           <input
             accept="image/*"
             style={{display: 'None'}}
             id="drForm"
-            multiple
             type="file"
-            onChange={this.handleUploadImage}
+            onChange={this.handleFileUpload}
             required={true}
           />
           <label htmlFor="drForm">
@@ -193,8 +222,35 @@ class App extends Component {
             </Button>
           </label>
           <span>{this.state.file.name}</span>
-
         </Box>
+        <TableContainer component={Paper}>
+          <Table>
+          <TableHead>
+              <TableRow >
+                <TableCell style={{color: "#fff"}}>SKU</TableCell>
+                <TableCell align={"right"}>Name</TableCell>
+                <TableCell align={"right"}>Description</TableCell>
+                <TableCell align={"right"}>Active</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {
+                !this.state.productsList.length ?
+                (<Typography align='center' paragraph>There are no products yet</Typography>) :
+                (this.state.productsList.map(product => {
+                  return (
+                    <TableRow hover={true} key={product.id}>
+                      <TableCell >{product.sku}</TableCell>
+                      <TableCell align={"right"}>{product.name}</TableCell>
+                      <TableCell align={"right"}>{product.description}</TableCell>
+                      <TableCell align={"right"}>{product.active ? 'Active' : 'Inactive'}</TableCell>
+                    </TableRow>
+                  );
+                }))
+              }
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     );
   }
