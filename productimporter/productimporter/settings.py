@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_celery_results',
     'products',
+    'celery_progress',
 ]
 
 MIDDLEWARE = [

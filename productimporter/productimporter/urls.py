@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path("api/v1/", include(("productimporter.api1", "api1"), namespace="api1"))
+    path("admin/", admin.site.urls),
+    path("api/v1/", include(("productimporter.api1", "api1"), namespace="api1")),
+    path("celery-progress/", include("celery_progress.urls")),
 ]
