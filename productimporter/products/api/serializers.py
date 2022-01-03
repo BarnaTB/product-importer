@@ -16,7 +16,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ["sku", "name", "description", "active"]
+        fields = ["id", "sku", "name", "description", "active"]
 
 
 class CsvUploadSerializer(serializers.Serializer):

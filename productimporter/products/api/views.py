@@ -54,11 +54,11 @@ class CsvUploadView(generics.GenericAPIView):
         io_string = io.StringIO(decoded_file)
         reader = csv.reader(io_string)
         next(reader)
-        task_id = upload_products.delay(list(reader))
+        task = upload_products.delay(list(reader))
 
         response_data = {
             "success": True,
-            "task_id": task_id,
+            "task_id": task.task_id,
             "message": "Products created successfully!"
         }
         

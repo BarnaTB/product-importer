@@ -2,9 +2,9 @@ from multiprocessing.pool import ThreadPool
 import os
 
 from celery.utils.log import get_task_logger
+from celery import shared_task
 from celery_progress.backend import Progress, ProgressRecorder
 
-from productimporter import celery_app as app
 from products.managers import ProductManager
 from products.models import Product
 
@@ -12,7 +12,7 @@ from products.models import Product
 logger = get_task_logger(__name__)
 
 
-@app.task()
+@shared_task(bind=True)
 def upload_products(self, products):
     """Celery task to asynchronously upload a batch of products
 
