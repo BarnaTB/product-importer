@@ -37,11 +37,15 @@ class App extends Component {
     },
     loading: false,
     file: '',
-    taskProgress: null
+    taskProgress: null,
+    delay: 3000
   }
 
   componentDidMount = () => {
     this.handleFetchProducts();
+    if (this.state.taskId) {
+      this.interval = setInterval(this.handleUploadProgress, this.state.delay);
+    }
   }
 
   handleSubmitForm = event => {
@@ -116,43 +120,63 @@ class App extends Component {
   }
 
   handleFileUpload = (event) => {
-    this.setState({
-      ...this.state,
-      file: event.target.files[0]
-    });
-    console.log('>>>>>>>>>>>>>>>>>>>> file', event.target.files[0]);
-    axios.post(
-      `http://localhost:8000/api/v1/products/upload/`,
-      {file: event.target.files[0]}
-      )
-      .then(response => this.setState({
-        ...this.state,
-        taskId: response.data.task_id
-      }))
-  }
+    if (event.target.files.length) {
+      const data = new FormData();
+      data.append('file', event.target.files[0])
 
-  // handleSubmitFile = () => {
-  //   pass
-  // }
-
-  handleUploadProgress = () => {
-    axios.get(
-      `http://localhost:8000/celery-progress/` + this.state.taskId
-      ).then(response => this.setState({
-        ...this.state,
-        taskProgress: response.data
-    })
-    ).catch(err => {
+      axios.post(
+        `http://localhost:8000/api/v1/products/upload/`,
+        data,
+        )
+        .then(response => this.setState({
+          ...this.state,
+          loading:true,
+          taskId: response.data.task_id
+        })).catch(err => console.log(err))
+    } else {
       this.setState({
         ...this.state,
         alert: {
           showAlert: true,
           severity: 'error',
           alertTitle: 'Oops!!!',
-          alertDetail: 'An error occurred while trying to track your upload progress!'
+          alertDetail: 'The file you are uploading is empty!'
         }
       })
-    })
+    }
+  }
+
+  handleUploadProgress = () => {
+    if (Object.keys(taskProgress).length && taskProgress.complete) {
+      this.setState({
+        ...this.state,
+        taskId: '',
+        alert: {
+          showAlert: true,
+          severity: 'success',
+          alertTitle: 'Hooray!!!',
+          alertDetail: 'Your products were uploaded successfully!'
+        }
+      })
+    } else {
+      axios.get(
+        `http://localhost:8000/celery-progress/` + this.state.taskId
+        ).then(response => this.setState({
+          ...this.state,
+          taskProgress: response.data
+      })
+      ).catch(err => {
+        this.setState({
+          ...this.state,
+          alert: {
+            showAlert: true,
+            severity: 'error',
+            alertTitle: 'Oops!!!',
+            alertDetail: 'An error occurred while trying to track your upload progress!'
+          }
+        })
+      })
+    }
   }
 
   clearAlert = () => {
@@ -210,25 +234,28 @@ class App extends Component {
           <input
             accept=".csv"
             style={{display: 'None'}}
-            id="drForm"
+            id="file"
             type="file"
             onChange={this.handleFileUpload}
             disabled={this.state.loading}
           />
-          <label htmlFor="drForm">
+          <label htmlFor="file">
             <Button
-              color="primary"
-              component="span"
+              color='primary'
+              component='span'
               startIcon={<CloudUploadIcon />}
-              onClick={this.handleFileUpload}
               disabled={this.state.loading}
             >
-              Upload Product CSV
+              {
+                this.state.loading ?
+                (<CircularProgress size={30} color='primary' />) :
+                ('Upload Product CSV')
+              }
             </Button>
           </label>
           <span>{this.state.file.name}</span>
         </Box>
-        {
+        {/* {
           this.state.taskId &&
           <ReactPolling
             url={`http://locahost:8000/celery-progress/ ${this.state.taskId}`}
@@ -242,9 +269,10 @@ class App extends Component {
             method={'GET'}
             render={({ startPolling, stopPolling, isPolling }) => {
               if(isPolling) {
-                return (
-                  <div> Hello I am polling</div>
-                );
+                this.setState({
+                  ...this.state,
+                  loading: true
+                })
               } else {
                 return (
                   <div> Hello I stopped polling</div>
@@ -252,9 +280,9 @@ class App extends Component {
               }
             }}
           />
-        }
+        } */}
         {
-          this.state.taskProgress && (
+          Object.keys(this.state.taskProgress).length && (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Box sx={{ width: '100%', mr: 1 }}>
                 <LinearProgress variant="determinate" value={this.state.taskProgress.percent} />
