@@ -17,6 +17,8 @@ import TableBody from '@mui/material/TableBody';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import LinearProgress from '@mui/material/LinearProgress';
+import ReactPolling from 'react-polling';
 
 
 class App extends Component {
@@ -34,7 +36,8 @@ class App extends Component {
       alertDetail: "",
     },
     loading: false,
-    file: ''
+    file: '',
+    taskProgress: null
   }
 
   componentDidMount = () => {
@@ -112,18 +115,15 @@ class App extends Component {
     });
   }
 
-  handleFileUpload = async (event) => {
-    await this.setState({
+  handleFileUpload = (event) => {
+    this.setState({
       ...this.state,
       file: event.target.files[0]
     });
-    this.handleSubmitFile();
-  }
-
-  handleSubmitFile = () => {
+    console.log('>>>>>>>>>>>>>>>>>>>> file', event.target.files[0]);
     axios.post(
-      `http:/localhost:8000/api/v1/products/upload/`,
-      {file: this.state.file}
+      `http://localhost:8000/api/v1/products/upload/`,
+      {file: event.target.files[0]}
       )
       .then(response => this.setState({
         ...this.state,
@@ -131,12 +131,16 @@ class App extends Component {
       }))
   }
 
+  // handleSubmitFile = () => {
+  //   pass
+  // }
+
   handleUploadProgress = () => {
     axios.get(
-      `http://localhost:8000/api/v1/task-progress/` + this.state.taskId
+      `http://localhost:8000/celery-progress/` + this.state.taskId
       ).then(response => this.setState({
         ...this.state,
-        taskProgress: response
+        taskProgress: response.data
     })
     ).catch(err => {
       this.setState({
@@ -204,12 +208,12 @@ class App extends Component {
           </Button><br/><br/>
           <p style={{margin: 'auto'}}>Or Upload a batch of products</p><br/><br/>
           <input
-            accept="image/*"
+            accept=".csv"
             style={{display: 'None'}}
             id="drForm"
             type="file"
             onChange={this.handleFileUpload}
-            required={true}
+            disabled={this.state.loading}
           />
           <label htmlFor="drForm">
             <Button
@@ -217,12 +221,52 @@ class App extends Component {
               component="span"
               startIcon={<CloudUploadIcon />}
               onClick={this.handleFileUpload}
+              disabled={this.state.loading}
             >
               Upload Product CSV
             </Button>
           </label>
           <span>{this.state.file.name}</span>
         </Box>
+        {
+          this.state.taskId &&
+          <ReactPolling
+            url={`http://locahost:8000/celery-progress/ ${this.state.taskId}`}
+            interval= {3000} // in milliseconds(ms)
+            retryCount={3} // this is optional
+            onSuccess={(response) => this.setState({
+              ...this.state,
+              taskProgress: response.data
+            })}
+            onFailure={() => console.log('handle failure')} // this is optional
+            method={'GET'}
+            render={({ startPolling, stopPolling, isPolling }) => {
+              if(isPolling) {
+                return (
+                  <div> Hello I am polling</div>
+                );
+              } else {
+                return (
+                  <div> Hello I stopped polling</div>
+                );
+              }
+            }}
+          />
+        }
+        {
+          this.state.taskProgress && (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Box sx={{ width: '100%', mr: 1 }}>
+                <LinearProgress variant="determinate" value={this.state.taskProgress.percent} />
+              </Box>
+              <Box sx={{ minWidth: 35 }}>
+                <Typography variant="body2" color="text.secondary">{`${Math.round(
+                  this.state.taskProgress.percent
+                )}%`}</Typography>
+              </Box>
+            </Box>
+          )
+        }
         <TableContainer component={Paper}>
           <Table>
           <TableHead>
