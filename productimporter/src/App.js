@@ -37,7 +37,7 @@ class App extends Component {
     },
     loading: false,
     file: '',
-    taskProgress: null,
+    taskProgress: {},
     delay: 3000
   }
 
