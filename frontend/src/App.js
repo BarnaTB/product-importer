@@ -18,7 +18,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LinearProgress from '@mui/material/LinearProgress';
-import ReactPolling from 'react-polling';
+// import ReactPolling from 'react-polling';
 
 
 class App extends Component {
@@ -104,7 +104,7 @@ class App extends Component {
   }
 
   handleFetchProducts = () => {
-    axios.get(`http://localhost:8000/api/v1/products/`)
+    axios.get(`/api/v1/products/`)
     .then(response => this.setState({
       ...this.state,
       products: response.data,
@@ -147,7 +147,7 @@ class App extends Component {
   }
 
   handleUploadProgress = () => {
-    if (Object.keys(taskProgress).length && taskProgress.complete) {
+    if (Object.keys(this.state.taskProgress).length && this.state.taskProgress.complete) {
       this.setState({
         ...this.state,
         taskId: '',
