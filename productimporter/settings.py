@@ -149,6 +149,8 @@ CORS_ORIGIN_WHITELIST = [
      'http://localhost:3000'
 ]
 
+CORS_ORIGIN_WHITELIST = get_env_variable("CORS_ORIGIN_WHITELIST", required=True).split(" ")
+
 CELERY_BROKER_URL = get_env_variable("CELERY_BROKER_URL", required=True)
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_CACHE_BACKEND = "django-cache"
