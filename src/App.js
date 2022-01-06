@@ -20,6 +20,9 @@ import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import LinearProgress from '@mui/material/LinearProgress';
 // import ReactPolling from 'react-polling';
 
+axios.defaults.xsrfCookieName = 'csrftoken'
+axios.defaults.xsrfHeaderName = 'X-CSRFToken'
+
 
 class App extends Component {
 
@@ -104,7 +107,7 @@ class App extends Component {
   }
 
   handleFetchProducts = () => {
-    axios.get(`/api/v1/products/`)
+    axios.get(`http://localhost:8000/api/v1/products/`)
     .then(response => this.setState({
       ...this.state,
       products: response.data,

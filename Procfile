@@ -1,3 +1,3 @@
 release: python manage.py migrate
-web: gunicorn fulfil_assignment.wsgi --log-file –
+web: gunicorn productimporter.wsgi --log-file –
 worker: celery -A productimporter worker -l info
