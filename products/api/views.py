@@ -68,13 +68,6 @@ class CsvUploadView(generics.GenericAPIView):
 class RetrieveUpdateDestroyProductsView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (AllowAny,)
     serializer_class = ProductSerializer
-
-    def delete(self, request, *args, **kwargs):
-        Product.objects.all().delete()
-
-        response_data = {
-            "success": True,
-            "message": "All products deleted successfully!"
-        }
-        
-        return Response(response_data, status=status.HTTP_200_OK)
+    lookup_url_kwargs = "sku"
+    lookup_field = "sku"
+    queryset = Product.objects.all()
