@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'products',
     'celery_progress',
     'django_celery_results',
+    'coreapi',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -116,7 +118,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 50
+    'PAGE_SIZE': 50,
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 
