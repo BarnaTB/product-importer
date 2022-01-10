@@ -35,4 +35,15 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 ```
 
-The project should be ready to run now so run `python manage.py runserver` and hit the endpoints according to the documentation here. 
+The project should be ready to run now so run `python manage.py runserver` and hit the endpoints according to the [documentation here](https://fulfilproductimporter.herokuapp.com/api/v1/docs/).
+
+## Running the tests
+Run the tests by running `python manage.py test`
+
+## Deployment
+
+The backend is deployed on Heroku [here](https://fulfilproductimporter.herokuapp.com) while the frontend project is deployed [here](https://fulfillproductimporter.herokuapp.com).
+
+## Acknowledgements
+
+Kudos to the recruitment team at [Fulfil.io](https://fulfil.io) for their unmatched support during the development of this project.
