@@ -45,6 +45,3 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
-  heroku_deploy:
-    jobs:
-      - heroku/deploy-via-git
