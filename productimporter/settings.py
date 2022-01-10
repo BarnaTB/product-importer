@@ -45,8 +45,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'products',
     'celery_progress',
-    'django_celery_results',
-    'coreapi',
     'drf_yasg',
 ]
 
