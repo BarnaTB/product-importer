@@ -15,6 +15,7 @@ services:
       - .env
     links:
       - db
+      - rabbitmq
   db:
     image: "postgres:11"
     restart: on-failure
@@ -22,5 +23,18 @@ services:
       - postgres:/var/lib/postgresql/data/
     env_file:
       - .env
+  rabbitmq:
+    image: rabbitmq:3-management
+  celery:
+    restart: on-failure
+    build:
+      context: .
+    command: celery -A productimporter worker -l info
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - rabbitmq
+      - app
 volumes:
   postgres:

@@ -1,7 +1,5 @@
 import csv, io
 
-from celery.result import AsyncResult
-
 from django.shortcuts import render
 from django.conf import settings
 
