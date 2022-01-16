@@ -16,9 +16,10 @@ from pathlib import Path
 
 from productimporter.settings_utils import get_env_variable
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'celery_progress',
 
+    'core',
     'products',
 ]
 
@@ -87,14 +89,13 @@ WSGI_APPLICATION = 'productimporter.wsgi.application'
 DATABASES = {
     'default': {
         "ENGINE": get_env_variable("DB_ENGINE", "django.db.backends.sqlite3", required=True),
-        "NAME": get_env_variable("DB_NAME", "productimporter"),
+        "NAME": get_env_variable("DB_NAME", "postgres"),
         "USER": get_env_variable("DB_USER", "postgres"),
         "PASSWORD": get_env_variable("DB_PASSWORD", "some_password"),
         "HOST": get_env_variable("DB_HOST", "localhost"),
         "PORT": get_env_variable("DB_PORT", 5432),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
