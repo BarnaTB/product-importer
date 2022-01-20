@@ -18,28 +18,17 @@ from products.models import Product
 
 logger = get_task_logger(__name__)
 
-progress_list = []
 
-
-def stream_task_progress(incrementor, maximum):
+def stream_task_progress(task_id):
     """Function to stream the progress of a celery task
     """
-    rows_processed = 0
+    initial_state = {}
     while True:
-        # task_result = TaskResult.objects.get(task_id=task_id)
-        # current_state = model_to_dict(task_result)
-        if rows_processed == maximum:
-            progress_list.clear()
-        else:
+        task_result = TaskResult.objects.get(task_id=task_id)
+        current_state = task_result.as_dict()
 
-            # if initial_state == current_state:
-            # print(type())
-            rows_processed += incrementor
-            progress_list.append((rows_processed, maximum))
-            print(f"rows processed >>>>>>>>>>> {rows_processed} <<<<<<<<<<<<<<<<<<")
-            # yield (rows_processed, maximum)
-
-        # initial_state = json.dumps(current_state)
+        if not initial_state == current_state:
+            yield current_state
 
 
 
@@ -51,34 +40,7 @@ def upload_products(self, products):
         products ([type]): [description]
     """
     product_manager = ProductManager(batch_size=1000)
-    # progress_recorder = ProgressRecorder(self)
-    # count = 0
-    number_of_products = len(products)
-    def stream_task_progress():
-        """Function to stream the progress of a celery task
-        """
-        rows_processed = 0
-        while True:
-            # task_result = TaskResult.objects.get(task_id=task_id)
-            # current_state = model_to_dict(task_result)
-            if rows_processed == number_of_products:
-                progress_list.clear()
-            else:
-
-                # if initial_state == current_state:
-                # print(type())
-                rows_processed += incrementor
-                progress_list.append((rows_processed, maximum))
-                print(f"rows processed >>>>>>>>>>> {rows_processed} <<<<<<<<<<<<<<<<<<")
-                yield (rows_processed, maximum)
-
-            # initial_state = json.dumps(current_state)
-            # progress_recorder.set_progress(
-            #     count + 1,
-            #     number_of_products,
-            #     f"{count} products processed")
     for row in products:
         product = Product(sku=row[1], name=row[0], description=row[2])
         product_manager.add(product)
-        stream_task_progress(1, number_of_products)
     product_manager.done()

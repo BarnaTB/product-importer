@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from productimporter.utils.decorators import required_fields
 from productimporter.utils.exceptions import CustomAPIException
 
-from products.tasks import progress_list, stream_task_progress, upload_products
+from products.tasks import stream_task_progress, upload_products
 from products.api.serializers import CsvUploadSerializer, ProductSerializer
 from products.models import Product
 
@@ -80,34 +80,14 @@ class TaskProgressStreamView(generics.GenericAPIView):
 
     @required_fields(["task_id"])
     def get(self, request, *args, **kwargs):
-        print(">>>>>>>>>>>>>>>>> ", kwargs)
         task_id = kwargs.get("task_id")
         response = StreamingHttpResponse(
-            streaming_content=stream_task_progress(),
-            # headers={
-            #     "Access-Control-Allow-Origin": "http://localhost:3000",
-            #     "Content-Type": "text/event-stream"
-            # }
+            streaming_content=stream_task_progress(task_id)
             )
         response.headers["Content-Type"] = "text/event-stream"
-        print((response.headers))
-        # response["Access-Control-Allow-Origin"] = "http://localhost:3000"
-        # response.headers["Keep-Alive"] = 200
-        # response.headers["Timeout"] = 100
-        print(dir(response))
-        print(response._iterator)
+        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
 
         return response
-
-
-# def stream_progress(request, *args, **kwargs):
-#     print(">>>>>>>>>>>>>>>>> ", kwargs)
-#     task_id = kwargs.get("task_id")
-#     print(task_id)
-#     response = StreamingHttpResponse(stream_task_progress(task_id))
-#     response["Content-Type"] = "text/event-stream"
-
-#     return response
 
 
 class RetrieveUpdateDestroyProductsView(generics.RetrieveUpdateDestroyAPIView):
