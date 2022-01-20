@@ -20,6 +20,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("products/",
-    include(("products.api.urls", "products"), namespace="products")),
+        include(("products.api.urls", "products"), namespace="products")),
     path("docs/", schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]

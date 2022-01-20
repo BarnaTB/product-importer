@@ -10,7 +10,7 @@ services:
     command: >
       bash -c "python manage.py migrate && 
       python manage.py wait_for_db && 
-      python manage.py runserver 0.0.0.0:8000"
+      gunicorn productimporter.wsgi:application -w 2 -b :8000 --reload"
     env_file:
       - .env
     links:

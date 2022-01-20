@@ -1,19 +1,22 @@
 import csv, io
+from urllib import response
 
 from django.shortcuts import render
 from django.conf import settings
+from django.http import StreamingHttpResponse
 
-from rest_framework import generics, status
+from rest_framework import generics, mixins, status
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from productimporter.utils.decorators import required_fields
+from productimporter.utils.exceptions import CustomAPIException
 
-from products.tasks import upload_products
+from products.tasks import progress_list, stream_task_progress, upload_products
 from products.api.serializers import CsvUploadSerializer, ProductSerializer
 from products.models import Product
 
 
-class ProductView(generics.ListCreateAPIView):
+class ProductView(mixins.DestroyModelMixin, generics.ListCreateAPIView):
     permission_classes = (AllowAny,)
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
@@ -39,6 +42,15 @@ class ProductView(generics.ListCreateAPIView):
 
         return Response(response_data, status=status.HTTP_201_CREATED)
 
+    def delete(self, request, *args, **kwargs):
+        self.queryset.delete()
+
+        response_data = {
+            "detail": "You deleted all products!"
+        }
+
+        return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
+
 
 class CsvUploadView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
@@ -61,6 +73,41 @@ class CsvUploadView(generics.GenericAPIView):
         }
         
         return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class TaskProgressStreamView(generics.GenericAPIView):
+    permission_classes = (AllowAny,)
+
+    @required_fields(["task_id"])
+    def get(self, request, *args, **kwargs):
+        print(">>>>>>>>>>>>>>>>> ", kwargs)
+        task_id = kwargs.get("task_id")
+        response = StreamingHttpResponse(
+            streaming_content=stream_task_progress(),
+            # headers={
+            #     "Access-Control-Allow-Origin": "http://localhost:3000",
+            #     "Content-Type": "text/event-stream"
+            # }
+            )
+        response.headers["Content-Type"] = "text/event-stream"
+        print((response.headers))
+        # response["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        # response.headers["Keep-Alive"] = 200
+        # response.headers["Timeout"] = 100
+        print(dir(response))
+        print(response._iterator)
+
+        return response
+
+
+# def stream_progress(request, *args, **kwargs):
+#     print(">>>>>>>>>>>>>>>>> ", kwargs)
+#     task_id = kwargs.get("task_id")
+#     print(task_id)
+#     response = StreamingHttpResponse(stream_task_progress(task_id))
+#     response["Content-Type"] = "text/event-stream"
+
+#     return response
 
 
 class RetrieveUpdateDestroyProductsView(generics.RetrieveUpdateDestroyAPIView):

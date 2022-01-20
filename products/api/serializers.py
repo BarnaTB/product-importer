@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+from django_celery_results.models import TaskResult
+
 from products.models import Product
 
 
@@ -24,3 +26,10 @@ class CsvUploadSerializer(serializers.Serializer):
 
     class Meta:
         fields = ["file"]
+
+
+class TaskResultSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = TaskResult
+        fields = "__all__"

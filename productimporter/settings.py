@@ -47,12 +47,14 @@ INSTALLED_APPS = [
     'drf_yasg',
     'celery_progress',
     'django_celery_results',
+    'gunicorn',
 
     'core',
     'products',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -60,7 +62,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'productimporter.urls'
@@ -145,7 +146,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = get_env_variable("CORS_ORIGIN_WHITELIST", required=True).split(" ")
+CORS_ALLOWED_ORIGINS = get_env_variable("CORS_ORIGIN_WHITELIST", required=True).split(" ")
+# CORS_ALLOW_CREDENTIALS = True
+print(CORS_ALLOWED_ORIGINS)
 
 CELERY_BROKER_URL = get_env_variable("CELERY_BROKER_URL", required=True)
 CELERY_RESULT_BACKEND = "django-db"
