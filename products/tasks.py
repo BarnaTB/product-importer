@@ -28,6 +28,7 @@ def stream_task_progress(task_id):
         current_state = task_result.as_dict()
 
         if not initial_state == current_state:
+            current_state = json.dumps(current_state)
             yield current_state
 
 
@@ -37,7 +38,7 @@ def upload_products(self, products):
     """Celery task to asynchronously upload a batch of products
 
     Args:
-        products ([type]): [description]
+        products ([list]): List of product rows
     """
     product_manager = ProductManager(batch_size=1000)
     for row in products:

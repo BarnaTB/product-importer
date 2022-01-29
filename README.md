@@ -4,7 +4,7 @@
 This is the backend service that enables a user to add a product to the database by filling a form, or uploading a csv file to upload a batch of products.
 
 ## Getting Started
-The product is built on the stack below:
+The product is built on the following stack:
 
 * Python 3.8
 * Celery
@@ -12,7 +12,7 @@ The product is built on the stack below:
 * PostgreSQL
 * Virtualenv
 
-Ensure you have PostgreSQL, RabbitMQ, and Python 3.8 installed and running prior to the steps that follow.
+Ensure you have Docker installed and running prior to the steps that follow.
 
 ## Installing
 

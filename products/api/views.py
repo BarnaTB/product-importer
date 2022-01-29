@@ -25,7 +25,7 @@ class ProductView(mixins.DestroyModelMixin, generics.ListCreateAPIView):
         """Method to create a new product manually
 
         Args:
-            request ([type]): [description]
+            request ([HttpRequest]): HttpRequest sent to the server
 
         Returns:
             dict: Dictionary containing a success status and message
@@ -43,6 +43,13 @@ class ProductView(mixins.DestroyModelMixin, generics.ListCreateAPIView):
         return Response(response_data, status=status.HTTP_201_CREATED)
 
     def delete(self, request, *args, **kwargs):
+        """Method to delete all products
+
+        Args:
+            request ([HttpRequest]): HttpRequest sent to the server
+            Returns:
+            dict: Dictionary containing a success message
+        """
         self.queryset.delete()
 
         response_data = {
@@ -57,6 +64,8 @@ class CsvUploadView(generics.GenericAPIView):
     serializer_class = CsvUploadSerializer
 
     def post(self, request, *args, **kwargs):
+        """Method to upload a csv of products
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         file = serializer.validated_data['file']
@@ -82,10 +91,9 @@ class TaskProgressStreamView(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         task_id = kwargs.get("task_id")
         response = StreamingHttpResponse(
-            streaming_content=stream_task_progress(task_id)
+            streaming_content=stream_task_progress(task_id),
             )
-        response.headers["Content-Type"] = "text/event-stream"
-        response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
+        response.headers["Content-Type"] = "application/octet-stream"
 
         return response
 

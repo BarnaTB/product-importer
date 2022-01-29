@@ -20,4 +20,4 @@ class Product(TimestampMixin):
     active = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"{self.sku}, {self.name}, {self.active}"
+        return f"{self.sku}, {self.name}, Active: {self.active}"
