@@ -7,5 +7,5 @@ urlpatterns = [
     path("", ProductView.as_view(), name="create_list_products"),
     path("upload/", CsvUploadView.as_view(), name="csv_upload"),
     path("product/<str:sku>/", RetrieveUpdateDestroyProductsView.as_view(), name="retrieve_update_delete_products"),
-    path("stream/<str:task_id>/", TaskProgressStreamView.as_view(), name="stream")
+    path("stream/<uuid:task_id>/", TaskProgressStreamView.as_view(), name="stream")
 ]

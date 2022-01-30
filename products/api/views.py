@@ -10,6 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from productimporter.utils.decorators import required_fields
 from productimporter.utils.exceptions import CustomAPIException
+from productimporter.settings_utils import get_env_variable
 
 from products.tasks import stream_task_progress, upload_products
 from products.api.serializers import CsvUploadSerializer, ProductSerializer
@@ -90,10 +91,13 @@ class TaskProgressStreamView(generics.GenericAPIView):
     @required_fields(["task_id"])
     def get(self, request, *args, **kwargs):
         task_id = kwargs.get("task_id")
+        print(task_id)
+        print(type(task_id))
         response = StreamingHttpResponse(
             streaming_content=stream_task_progress(task_id),
             )
-        response.headers["Content-Type"] = "application/octet-stream"
+        response.headers["Content-Type"] = "text/event-stream"
+        response.headers["Access-Control-Allow-Origin"] = get_env_variable("CORS_ORIGIN_WHITELIST", required=True)
 
         return response
 
