@@ -25,6 +25,9 @@ $ git clone https://github.com/BarnaTB/product-importer.git
 # open the project directory
 $ cd product-importer
 
+# checkout to this branch
+$ git checkout dockerize-backend-service
+
 # build the project and all its dependencies
 $ make build
 
@@ -35,7 +38,7 @@ $ make up
 The project should be ready to run now so run `python manage.py runserver` and hit the endpoints according to the [documentation here](https://fulfilproductimporter.herokuapp.com/api/v1/docs/).
 
 ## Running the tests
-Run the tests by running `make test`
+Run the tests by running `make test` or `make test APP=<insert-app-name>` to run app specific tests
 
 ## Deployment
 
